@@ -1,15 +1,22 @@
+Object = require 'libraries/classic/classic'
+
 function love.load()
-  image = love.graphics.newImage("/assets/image.png")
-  love.window.setMode(800, 600, {resizable = true, vsync = true})
-  love.window.setTitle("BytePath")
+  local objectFiles = {}
+  requireFiles('objects', objectFiles)
+  instantiateFiles(objectFiles)
+
+  -- circle = Circle(400, 300, 50)
+  hypercircle = Hypercircle(400, 300, 50, 10, 120)
 end
 
 function love.update(dt)
-
+  -- circle:update(dt)
+  hypercircle:update(dt)
 end
 
 function love.draw()
-  love.graphics.draw(image, 0, 0)
+  -- circle:draw()
+  hypercircle:draw()
 end
 
 function love.run()
@@ -51,5 +58,23 @@ function love.run()
     end
 
     if love.timer then love.timer.sleep(0.001) end
+  end
+end
+
+function requireFiles(folder, fileList) 
+  local files = love.filesystem.getDirectoryItems(folder)
+  for _, file in ipairs(files) do
+    local filepath = folder .. '/' .. file
+    if love.filesystem.isFile(filepath) 
+      then table.insert(fileList, filepath)
+    else 
+      recursiveRequire(filepath, fileList)
+    end
+  end
+end
+
+function instantiateFiles(fileList) 
+  for _, file in ipairs(fileList) do 
+    require(file:sub(1, -5))
   end
 end
